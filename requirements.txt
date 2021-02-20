@@ -1,0 +1,5 @@
+python-telegram-bot==13.2
+black==20.8b1
+pylint==2.6.2
+mypy==0.800
+isort==5.7.0

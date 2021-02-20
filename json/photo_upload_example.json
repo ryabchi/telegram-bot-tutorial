@@ -1,0 +1,53 @@
+{
+  "update_id": 404096026,
+  "message": {
+    "message_id": 1107,
+    "date": 1613296340,
+    "chat": {
+      "id": 7777777,
+      "type": "private",
+      "username": "username",
+      "first_name": "FirstName",
+      "last_name": "LastName"
+    },
+    "entities": [],
+    "caption_entities": [],
+    "photo": [
+      {
+        "file_id": "AgACAgIAAxkBAAIEU2Ao8tTGjW4nrnKMtDp_-nb5jKKdAAI-sjEbT6pISVxE2fJf9_fGiuoymy4AAwEAAwIAA20AA8PPAgABHgQ",
+        "file_unique_id": "AQADiuoymy4AA8PPAgAB",
+        "width": 320,
+        "height": 168,
+        "file_size": 15391
+      },
+      {
+        "file_id": "AgACAgIAAxkBAAIEU2Ao8tTGjW4nrnKMtDp_-nb5jKKdAAI-sjEbT6pISVxE2fJf9_fGiuoymy4AAwEAAwIAA3gAA8DPAgABHgQ",
+        "file_unique_id": "AQADiuoymy4AA8DPAgAB",
+        "width": 800,
+        "height": 419,
+        "file_size": 84531
+      },
+      {
+        "file_id": "AgACAgIAAxkBAAIEU2Ao8tTGjW4nrnKMtDp_-nb5jKKdAAI-sjEbT6pISVxE2fJf9_fGiuoymy4AAwEAAwIAA3kAA8HPAgABHgQ",
+        "file_unique_id": "AQADiuoymy4AA8HPAgAB",
+        "width": 1199,
+        "height": 628,
+        "file_size": 126068
+      }
+    ],
+    "new_chat_members": [],
+    "new_chat_photo": [],
+    "delete_chat_photo": false,
+    "group_chat_created": false,
+    "supergroup_chat_created": false,
+    "channel_chat_created": false,
+    "from": {
+      "id": 7777777,
+      "first_name": "FirstName",
+      "is_bot": false,
+      "last_name": "LastName",
+      "username": "username",
+      "language_code": "ru"
+    }
+  }
+}
