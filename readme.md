@@ -38,3 +38,5 @@
 - Установим необходимые зависимости:
 `pip install -r requirements.txt`
   
+### Материалы мастер-класса
+[Можно найти в Telegram канале tbotshowroom](https://t.me/tbotshowroom)
