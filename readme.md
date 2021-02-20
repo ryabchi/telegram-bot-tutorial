@@ -30,10 +30,17 @@
 `pip install virtualenv`
   
 - Создадим виртуальное окружение:
-`virtualenv venv`
+
+Linux/Mac: `virtualenv venv`
+
+Windows: `python -m venv venv`
   
 - Активируем его:
-`source venv/bin/activate`
+
+Mac: `source venv/bin/activate`
+
+Посмотреть как запустить в своей оболочке можно [тут](https://docs.python.org/3/library/venv.html).
+
   
 - Установим необходимые зависимости:
 `pip install -r requirements.txt`
