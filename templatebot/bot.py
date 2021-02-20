@@ -50,7 +50,7 @@ def add_transaction(update: Update, _:CallbackContext) -> None:
                 update.message.reply_text(f'Transaction has created!\n{transaction}')
 
 
-def total(update: Update, _:CallbackContext) -> None:
+def total(update: Update, _: CallbackContext) -> None:
     if not os.path.exists(f'data/{str(update.message.from_user.id)}.txt'):
         update.message.reply_text('To start, you should send me "/start"')
     else:
