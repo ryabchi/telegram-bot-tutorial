@@ -13,6 +13,7 @@ from telegram.ext import (
     CommandHandler,
     InlineQueryHandler,
     Updater,
+    MessageHandler,
 )
 
 from templatebot.config import TELEGRAM_BOT_TOKEN
@@ -27,6 +28,19 @@ logger = logging.getLogger(__name__)
 def start_command_handler(update: Update, _: CallbackContext) -> None:
     """ Send a message when the command /start is issued."""
     update.message.reply_text('Add your text here')
+
+
+def text_handler(update: Update, context: CallbackContext) -> None:
+    user_id = update.message.from_user.id
+    user_name = update.message.from_user.username
+
+    message_text = update.message.text
+
+    context.bot.send_message(
+        update.message.from_user.id,
+        message_text,
+    )
+    update.message.reply_text('Some reply')
 
 
 def button_handler(update: Update, _: CallbackContext) -> None:
@@ -64,6 +78,10 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler('start', start_command_handler))
     dispatcher.add_handler(InlineQueryHandler(inline_query_handler))
     dispatcher.add_handler(CallbackQueryHandler(button_handler))
+
+    dispatcher.add_handler(
+        MessageHandler(Filters.text & ~Filters.command, text_handler)  # type: ignore
+    )
 
     # Start the Bot
     updater.start_polling()
