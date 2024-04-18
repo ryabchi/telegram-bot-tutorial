@@ -1,3 +1,5 @@
-import os
+import base64
 
-TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
+bot_secret = ''
+
+TELEGRAM_BOT_TOKEN = base64.b64decode(bot_secret).decode()

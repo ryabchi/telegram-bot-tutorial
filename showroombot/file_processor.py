@@ -8,7 +8,7 @@ from common.file_uploader import Resource, ResourceType, upload
 FILE_STORAGE: Dict[str, Resource] = {}
 
 
-def process_file_command(bot: Bot, chat_id: int, command: str) -> None:
+async def process_file_command(bot: Bot, chat_id: int, command: str) -> None:
     resource = FILE_STORAGE.get(command)
     if resource:
         text = f'Файл уже загружен, отправляем используя file_id:\n {resource.file_id}'
@@ -33,14 +33,14 @@ def process_file_command(bot: Bot, chat_id: int, command: str) -> None:
         else:
             raise Exception('Unexpected command')
 
-    upload(bot, chat_id, resource, text)
+    await upload(bot, chat_id, resource, text)
     FILE_STORAGE[command] = resource
 
 
-def send_botfather_command(bot: Bot, chat_id: int) -> None:
+async def send_botfather_command(bot: Bot, chat_id: int) -> None:
     directory = pathlib.Path(__file__).parent.absolute()
     resource = Resource(
         path=f'{directory}/file_example/botfather_commands.jpg',
         resource_type=ResourceType.PICTURE,
     )
-    upload(bot, chat_id, resource)
+    await upload(bot, chat_id, resource)

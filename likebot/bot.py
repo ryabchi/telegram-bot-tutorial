@@ -7,15 +7,15 @@ from telegram import (
     InlineKeyboardMarkup,
     InlineQueryResultArticle,
     InputTextMessageContent,
-    ParseMode,
     Update,
 )
+from telegram.constants import ParseMode
 from telegram.ext import (
     CallbackContext,
     CallbackQueryHandler,
     CommandHandler,
     InlineQueryHandler,
-    Updater,
+    Application,
 )
 
 from likebot.config import TELEGRAM_BOT_TOKEN
@@ -40,21 +40,21 @@ def get_keyboard(like: str = '👍', dislike: str = '👎') -> InlineKeyboardMar
     )
 
 
-def start_command_handler(update: Update, _: CallbackContext) -> None:
+async def start_command_handler(update: Update, _: CallbackContext) -> None:
     """ Send a message when the command /start is issued."""
-    update.message.reply_text(
+    await update.message.reply_text(
         'Hi! I\'m inline bot for adding reactions to your post. '
         'Use me in channel in inline mode!'
     )
 
 
-def button_handler(update: Update, _: CallbackContext) -> None:
+async def button_handler(update: Update, _: CallbackContext) -> None:
     """ Handle all query when user press buttons that created by this bot """
     query = update.callback_query
 
     # CallbackQueries need to be answered, even if no notification to the user is needed
     # Some clients may have trouble otherwise. See https://core.telegram.org/bots/api#callbackquery
-    query.answer()
+    await query.answer()
 
     # add user reaction to database
     like_db.add_reaction(query.inline_message_id, query.from_user.id, query.data)
@@ -64,10 +64,10 @@ def button_handler(update: Update, _: CallbackContext) -> None:
     dislike = f"👎 {like_db.get_count(query.inline_message_id, 'dislike')}"
 
     # edit only keyboard that attached to message
-    query.edit_message_reply_markup(reply_markup=get_keyboard(like, dislike))
+    await query.edit_message_reply_markup(reply_markup=get_keyboard(like, dislike))
 
 
-def inline_query_handler(update: Update, _: CallbackContext) -> None:
+async def inline_query_handler(update: Update, _: CallbackContext) -> None:
     """ Handle the inline query. """
     if not update.inline_query.query:
         return
@@ -83,25 +83,20 @@ def inline_query_handler(update: Update, _: CallbackContext) -> None:
         ),
     ]  # struct for show bot menu in telegram
 
-    update.inline_query.answer(results)  # type: ignore
+    await update.inline_query.answer(results)  # type: ignore
 
 
 def main() -> None:
-    # Create the Updater and pass it your bot's token.
-    updater = Updater(TELEGRAM_BOT_TOKEN)  # type: ignore
+    """Start the bot."""
+    # Create the Application and pass it your bot's token.
+    application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
 
-    dispatcher = updater.dispatcher  # type: ignore
+    application.add_handler(CommandHandler('start', start_command_handler))
+    application.add_handler(InlineQueryHandler(inline_query_handler))
+    application.add_handler(CallbackQueryHandler(button_handler))
 
-    dispatcher.add_handler(CommandHandler('start', start_command_handler))
-    dispatcher.add_handler(InlineQueryHandler(inline_query_handler))
-    dispatcher.add_handler(CallbackQueryHandler(button_handler))
-
-    # Start the Bot
-    updater.start_polling()
-
-    # Run the bot until the user presses Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT
-    updater.idle()
+    # Run the bot until the user presses Ctrl-C
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == '__main__':
