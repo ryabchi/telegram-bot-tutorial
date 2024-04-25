@@ -16,7 +16,6 @@ bot.
 """
 
 import logging
-from turtle import up
 
 from telegram import ForceReply, Update
 from telegram.ext import (
@@ -47,6 +46,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /start is issued."""
     user = update.effective_user
     await update.message.reply_text("Hello, my friend!")
+    await update.message.reply_text("I'm todo bot and I can add tasks to your list! 😃")
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
