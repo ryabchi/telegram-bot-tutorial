@@ -357,4 +357,5 @@ dmypy.json
 cython_debug/
 
 *todobot/config.py
+.idea
 
