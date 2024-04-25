@@ -21,6 +21,8 @@ from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 from Todobot.config import TOKEN
 
+Tasks = dict()
+
 # Enable logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -44,9 +46,19 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await update.message.reply_text("Help!")
 
 
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
-    await update.message.reply_text(update.message.text)
+    user = update.effective_user
+    some_text = update.message.text
+    if not Tasks.get(user.id):
+        Tasks[user.id] = []
+    Tasks[user.id].append(some_text)
+    
+    message = 'Задача добавлена \n\n'
+    message = f'{message}Список задач:\n'
+    tasks_list = '\n'.join(Tasks[user.id])
+    message = f'{message}{tasks_list}'
+    await update.message.reply_text(message)
 
 
 def main() -> None:
@@ -59,7 +71,7 @@ def main() -> None:
     application.add_handler(CommandHandler("help", help_command))
 
     # on non command i.e message - echo the message on Telegram
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_handler))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)
