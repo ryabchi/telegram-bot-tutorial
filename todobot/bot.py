@@ -22,6 +22,10 @@ from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandl
 
 from todobot.config import TELEGRAM_TOKEN
 
+TASKS= dict()
+commands = {'/help' : 'view commands','/start':'hi)',
+            '/add_action':'add action in todo list','/review_actions':' view actions from todo list'}
+
 # Enable logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
@@ -45,10 +49,42 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
     await update.message.reply_text("Help!")
+    for command,description in commands.items():
+        await update.message.reply_text(f'{command} - {description}')
 
 
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Echo the user message."""
+async def add_action_to_list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user = update.effective_user
+    await update.message.reply_text("Пожалуйста, отправьте текст задачи после команды /add_action.")
+    context.chat_data["waiting_for_task"] = True
+
+async def get_next_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if "waiting_for_task" in context.chat_data and context.chat_data["waiting_for_task"]:
+        user = update.effective_user
+        next_message = update.message.text
+        if user.id not in TASKS or not TASKS[user.id]:
+            TASKS[user.id] = []
+        TASKS[user.id].append(next_message)
+        del context.chat_data["waiting_for_task"]
+        await update.message.reply_text("Задача добавлена.")
+    else:
+        pass
+
+
+
+async def return_actions_from_list(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    user = update.effective_user
+    if user.id not in TASKS or not TASKS[user.id]:
+        message='У вас нет задач'
+        await update.message.reply_text(message)
+    else:
+        message='Список задач:\n\n'
+        tasks_list='\n'.join(TASKS[user.id])
+        message=f'{message}{tasks_list}'
+        await update.message.reply_text(message)
+
+
+async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(update.message.text)
 
 
@@ -60,9 +96,12 @@ def main() -> None:
     # on different commands - answer in Telegram
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("add_action", add_action_to_list))
+    application.add_handler(CommandHandler("review_actions", return_actions_from_list))
+
 
     # on non command i.e message - echo the message on Telegram
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, get_next_message))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)
