@@ -20,7 +20,7 @@ import logging
 from telegram import ForceReply, Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
-from config import DefenceFromSkam
+from todobot.config import DefenceFromSkam
 
 # Enable logging
 logging.basicConfig(
