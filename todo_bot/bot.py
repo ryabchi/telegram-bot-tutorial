@@ -16,6 +16,7 @@ bot.
 """
 
 import logging
+from turtle import up
 
 from telegram import ForceReply, Update
 from telegram.ext import (
@@ -26,7 +27,9 @@ from telegram.ext import (
     filters,
 )
 
-from app.config import TELEGRAM_TOKEN
+from todo_bot.config import TELEGRAM_TOKEN
+
+TASKS: dict[int, list[str]] = dict()
 
 # Enable logging
 logging.basicConfig(
@@ -51,9 +54,15 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await update.message.reply_text("Help!")
 
 
-async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Echo the user message."""
-    await update.message.reply_text(update.message.text)
+async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Add new task."""
+
+    user = update.effective_user
+    TASKS.setdefault(user.id, []).append(update.message.text)
+
+    tasks = '\n'.join(TASKS[user.id])
+    message = f"Task added to list. All list:\n{tasks}"
+    await update.message.reply_text(message)
 
 
 def main() -> None:
@@ -66,7 +75,7 @@ def main() -> None:
     application.add_handler(CommandHandler("help", help_command))
 
     # on non command i.e message - echo the message on Telegram
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_handler))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)

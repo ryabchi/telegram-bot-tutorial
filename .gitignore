@@ -2,6 +2,7 @@
 
 ### Custom
 likebot/like.db
+todo_bot/config.py
 
 ### Python template
 # Byte-compiled / optimized / DLL files

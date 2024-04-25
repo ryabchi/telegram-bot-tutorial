@@ -1,4 +1,4 @@
-from app.bot import main
+from todo_bot.bot import main
 
 if __name__ == "__main__":
     main()
