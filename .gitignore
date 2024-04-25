@@ -356,4 +356,4 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-todobot/config
+todobot/config.py
