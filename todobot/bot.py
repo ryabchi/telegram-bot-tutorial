@@ -25,8 +25,8 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
-
 from todobot.config import TELEGRAM_TOKEN
+
 
 TASKS: dict[int, list[str]] = dict()
 
@@ -66,6 +66,31 @@ async def add_task(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     else:
         await update.message.reply_text("Please provide a task description.")
 
+async def remove_task(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Remove a task using /remove command."""
+    user = update.effective_user
+    args = context.args
+    if not args:
+        await update.message.reply_text("Please provide a task description or a task index.")
+        return
+
+    # Check if the argument is a task description or a task index
+    try:
+        task_index = int(args[0]) - 1
+        tasks = TASKS.get(user.id, [])
+        if 0 <= task_index < len(tasks):
+            removed_task = tasks.pop(task_index)
+            await update.message.reply_text(f"Removed task: {removed_task}")
+        else:
+            await update.message.reply_text("Invalid task index.")
+    except ValueError:
+        task_description = ' '.join(args)
+        tasks = TASKS.get(user.id, [])
+        if task_description in tasks:
+            tasks.remove(task_description)
+            await update.message.reply_text(f"Removed task: {task_description}")
+        else:
+            await update.message.reply_text("Task not found.")
 
 def main() -> None:
     """Start the bot."""
@@ -76,6 +101,7 @@ def main() -> None:
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("add", add_task))
+    application.add_handler(CommandHandler("remove", remove_task))
 
     # on non command i.e message - echo the message on Telegram
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, add_task))
