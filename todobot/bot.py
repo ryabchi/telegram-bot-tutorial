@@ -17,7 +17,7 @@ bot.
 
 import logging
 
-from telegram import ForceReply, Update
+from telegram import Update
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -54,15 +54,17 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await update.message.reply_text("Help!")
 
 
-async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Add new task."""
-
+async def add_task(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Add new task using /add command."""
     user = update.effective_user
-    TASKS.setdefault(user.id, []).append(update.message.text)
-
-    tasks = '\n'.join(TASKS[user.id])
-    message = f"Task added to list. All list:\n{tasks}"
-    await update.message.reply_text(message)
+    task_description = ' '.join(context.args)
+    if task_description:
+        TASKS.setdefault(user.id, []).append(task_description)
+        tasks = '\n'.join(TASKS[user.id])
+        message = f"Task added to list. All list:\n{tasks}"
+        await update.message.reply_text(message)
+    else:
+        await update.message.reply_text("Please provide a task description.")
 
 
 def main() -> None:
@@ -73,9 +75,10 @@ def main() -> None:
     # on different commands - answer in Telegram
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("add", add_task))
 
     # on non command i.e message - echo the message on Telegram
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_handler))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, add_task))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)
