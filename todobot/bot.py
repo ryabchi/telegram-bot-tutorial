@@ -92,6 +92,16 @@ async def remove_task(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         else:
             await update.message.reply_text("Task not found.")
 
+async def view_tasks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """View all tasks in the user's list."""
+    user = update.effective_user
+    tasks = TASKS.get(user.id, [])
+    if tasks:
+        tasks_message = '\n'.join(tasks)
+        await update.message.reply_text(f"Your tasks:\n{tasks_message}")
+    else:
+        await update.message.reply_text("You have no tasks.")
+
 def main() -> None:
     """Start the bot."""
     # Create the Application and pass it your bot's token.
@@ -102,6 +112,7 @@ def main() -> None:
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("add", add_task))
     application.add_handler(CommandHandler("remove", remove_task))
+    application.add_handler(CommandHandler("view", view_tasks))
 
     # on non command i.e message - echo the message on Telegram
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, add_task))
