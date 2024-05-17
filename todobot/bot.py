@@ -83,7 +83,7 @@ async def inline_handler(update: Update, context: CallbackContext) -> None:
     if chat.checks_buttons[user_id][Actions.DELETE_TASK.value]:
         chat.checks_buttons[user_id][Actions.DELETE_TASK.value] = False
         chat.tasks[user_id][categ].pop(int(query.data))
-        await query.edit_message_text(f"Task {query.data} deleted successfully! ✅")
+        await query.edit_message_text(f"Task {int(query.data) + 1} deleted successfully! ✅")
 
     elif chat.checks_buttons[user_id][Actions.DELETE_CATEGORY.value]:
         chat.checks_buttons[user_id][Actions.DELETE_CATEGORY.value] = False
@@ -119,7 +119,7 @@ async def keyboard_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         chat.checks_buttons[user_id][Actions.ADD_CATEGORY.value] = False
         if categ is not None and chat.tasks[user_id][categ]:
             keyboards = [
-                [InlineKeyboardButton(task, callback_data=str(i + 1))]
+                [InlineKeyboardButton(task, callback_data=str(i))]
                 for i, task in enumerate(chat.tasks[user_id][categ])
             ]
             inline_keyboard = InlineKeyboardMarkup(keyboards)
