@@ -57,21 +57,26 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 async def add_task(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Add new task using /add command."""
     user = update.effective_user
-    task_description = ' '.join(context.args)
-    if task_description:
+    task_description = " ".join(context.args)
+
+    if not task_description:
+        await update.message.reply_text("Please provide a task description.")
+        return
+    else:
         TASKS.setdefault(user.id, []).append(task_description)
-        tasks = '\n'.join(TASKS[user.id])
+        tasks = "\n".join(TASKS[user.id])
         message = f"Task added to list. All list:\n{tasks}"
         await update.message.reply_text(message)
-    else:
-        await update.message.reply_text("Please provide a task description.")
+
 
 async def remove_task(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Remove a task using /remove command."""
     user = update.effective_user
     args = context.args
     if not args:
-        await update.message.reply_text("Please provide a task description or a task index.")
+        await update.message.reply_text(
+            "Please provide a task description or a task index."
+        )
         return
 
     # Check if the argument is a task description or a task index
@@ -84,7 +89,7 @@ async def remove_task(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         else:
             await update.message.reply_text("Invalid task index.")
     except ValueError:
-        task_description = ' '.join(args)
+        task_description = " ".join(args)
         tasks = TASKS.get(user.id, [])
         if task_description in tasks:
             tasks.remove(task_description)
@@ -92,15 +97,17 @@ async def remove_task(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         else:
             await update.message.reply_text("Task not found.")
 
+
 async def view_tasks(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """View all tasks in the user's list."""
     user = update.effective_user
     tasks = TASKS.get(user.id, [])
     if tasks:
-        tasks_message = '\n'.join(tasks)
+        tasks_message = "\n".join(tasks)
         await update.message.reply_text(f"Your tasks:\n{tasks_message}")
     else:
         await update.message.reply_text("You have no tasks.")
+
 
 def main() -> None:
     """Start the bot."""
